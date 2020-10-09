@@ -8,9 +8,9 @@ By downloading these data, one is assumed to agree to the terms of our Fair Use 
 
 ---
 
-Detailed explanations to the SDR programs were published in our paper.
+Detailed explanations to the SRR programs were published in our paper.
 
-The programs in the SDR method were developed under Python 3.7. 
+The programs in the SRR method were developed under Python 3.7. The SRR method is mentioned as SDR method in the code. 
 
 Dependency Python packages: 
 
