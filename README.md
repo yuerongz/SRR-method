@@ -30,5 +30,5 @@ Dependency Python packages:
 
 #### Contact information:
 
-Yuerong Zhou, yuerongz@student.unimelb.edu.au, University of Melbourne, Australia
+Yuerong Zhou, yuerongz@student.unimelb.edu.au, The University of Melbourne, Australia
 
