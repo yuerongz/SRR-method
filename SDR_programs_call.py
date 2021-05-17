@@ -4,10 +4,10 @@ from SDR_algorithm_reco import reconstruct_flood_inundation_map
 
 
 def sdr_Searching(maximum_extent_inundation_map, time_step_of_maximum_if_nc_file_used, 
-				  dem_tif_file, stopping_values_in_dem, 
-				  results_dir, output_sdr_shapefile_name, 
-				  customised_searching_win_size=9, initial_run_bool=True, 
-				  require_representative_thalweg_selection_bool=True, rep_traj_ratio=1/200):
+		  dem_tif_file, stopping_values_in_dem, 
+		  results_dir, output_sdr_shapefile_name, 
+		  customised_searching_win_size=9, initial_run_bool=True, 
+		  require_representative_thalweg_selection_bool=True, rep_traj_ratio=1/200):
 	"""
 	This function is used for SDR Thalwegs configuration ONLY. For mainstream centroid line definition, use sdr_Searching_MCL.
 	Inputs:
@@ -49,9 +49,9 @@ def sdr_Searching(maximum_extent_inundation_map, time_step_of_maximum_if_nc_file
 
 
 def sdr_Searching_MCL(starting_coordinates, dem_tif_file, stopping_values_in_dem,
-					  results_dir, output_sdr_shapefile_name,  
-					  dem_aggregate_rate=3, dem_aggregate_function=np.nanmean, 
-					  customised_searching_win_size=9):
+		      results_dir, output_sdr_shapefile_name,  
+		      dem_aggregate_rate=3, dem_aggregate_function=np.nanmean, 
+		      customised_searching_win_size=9):
 	"""
 	This function is used for mainstream centroid line definition ONLY. For SDR_Thalwegs configuration, use sdr_Searching.
 	Inputs: 
@@ -78,7 +78,7 @@ def sdr_Searching_MCL(starting_coordinates, dem_tif_file, stopping_values_in_dem
 
 
 def sdr_RL(mcl_file, sdr_thalwegs_file, resample_rate_mcl, resample_rate_sdr_thalwegs, 
-		   results_dir, output_rls_file_name):
+	   results_dir, output_rls_file_name):
 	"""
 	This function is to extract representative locations for DL modelling from sdr_Searching and sdr_Searching_MCL results.
 	Inputs: 
@@ -94,16 +94,16 @@ def sdr_RL(mcl_file, sdr_thalwegs_file, resample_rate_mcl, resample_rate_sdr_tha
 	"""
 	starttime = time()
 	extract_rep_pts(f'{input_dir}{mcl_file}', f'{input_dir}{sdr_thalwegs_file}', 
-					resample_rate_mcl, resample_rate_sdr_thalwegs, 
-					results_dir, output_rls_file_name)
+			resample_rate_mcl, resample_rate_sdr_thalwegs, 
+			results_dir, output_rls_file_name)
 	print(f"Used time for SDR-RL: {time() - starttime}s")
 	return 0
 
 
 def sdr_Reco(dem_tif_file, targeted_x_coords, targeted_y_coords, 
-			 rls_shp_file, sdr_thalwegs_file, water_levels_at_rls, 
-			 tidal_boundary_grids_tif_file=None, sealvl=None, 
-			 save_to_tif_file=None, results_dir=None, reference_tif_file=None):
+	     rls_shp_file, sdr_thalwegs_file, water_levels_at_rls, 
+	     tidal_boundary_grids_tif_file=None, sealvl=None, 
+	     save_to_tif_file=None, results_dir=None, reference_tif_file=None):
 	"""
 	This function is to reconstruct the flood inundation map from water level information at RLs.
 	Inputs: 
@@ -128,8 +128,8 @@ def sdr_Reco(dem_tif_file, targeted_x_coords, targeted_y_coords,
 	if save_to_tif_file is None:
 		starttime = time()
 		output_arr = reconstruct_flood_inundation_map(dem_tif_file, targeted_x_coords, targeted_y_coords,
-													  rls_shp_file, sdr_thalwegs_file, water_levels_at_rls, 
-													  tidal_boundary_grids_tif_file, sealvl)
+							      rls_shp_file, sdr_thalwegs_file, water_levels_at_rls, 
+							      tidal_boundary_grids_tif_file, sealvl)
 		print(f"Used time for SDR-Reco: {time() - starttime}s")
 		return output_arr
 	else:
@@ -139,9 +139,9 @@ def sdr_Reco(dem_tif_file, targeted_x_coords, targeted_y_coords,
 		dem_tif_file = dem_checking(dem_tif_file)
 		starttime = time()
 		reconstruct_flood_inundation_map(dem_tif_file, targeted_x_coords, targeted_y_coords,
-										 rls_shp_file, sdr_thalwegs_file, water_levels_at_rls, 
-										 tidal_boundary_grids_tif_file, sealvl, 
-										 f"{results_dir}{save_to_tif_file}", reference_tif_file)
+						 rls_shp_file, sdr_thalwegs_file, water_levels_at_rls, 
+						 tidal_boundary_grids_tif_file, sealvl, 
+						 f"{results_dir}{save_to_tif_file}", reference_tif_file)
 		print(f"Used time for SDR-Reco: {time() - starttime}s")
 		return 0
 
