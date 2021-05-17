@@ -29,8 +29,7 @@ def sdr_Searching(maximum_extent_inundation_map, time_step_of_maximum_if_nc_file
 			SDR Thalwegs in a Line Shapefile(ESRI)
 	"""
 	directory_checking(results_dir)
-	stpts = get_starting_pts_from_maximum_inundation_extent(maximum_extent_inundation_map, 
-															time_step_of_maximum_if_nc_file_used)
+	stpts = get_starting_pts_from_maximum_inundation_extent(maximum_extent_inundation_map, time_step_of_maximum_if_nc_file_used)
 	dem_tif_file = dem_checking(dem_tif_file)
 	if require_representative_thalweg_selection_bool:
 		starttime = time()
