@@ -1,7 +1,7 @@
-from osgeo import gdal, ogr
+from osgeo import ogr
 import numpy as np
-from gdal_func import gdal_asarray, gdalconst
-import os
+import os, math
+import scipy.spatial.distance as dist
 
 
 def directory_checking(target_dir):
@@ -13,8 +13,8 @@ def directory_checking(target_dir):
 
 
 def dem_checking(demtif):
-	with open(demtif) as f:
-		print('DEM in .tif format is available~~ Thanks!')
+    with open(demtif) as f:
+        print('DEM in .tif format is available~~ Thanks!')
     return demtif
 
 
@@ -42,41 +42,41 @@ def points_along_line(line_ls, distance, start_offset=0, end_offset=0):
 
 
 def perform_DUPLEX_to_pts_for_sdr_rl(potential_pts, ratio_of_choose):
-	# choose points based on coordinates by DUPLEX method
-	no_of_chosen_pts = math.ceil(len(potential_pts) * ratio_of_choose)
-	potential_pts = np.array(potential_pts)
-	starting_pts = np.array([])
-	all_pts = potential_pts
-	dist_m = dist.cdist(potential_pts, potential_pts, 'sqeuclidean')
-	r1, r2 = np.argwhere(dist_m == dist_m.max())[0]
-	dist_m[dist_m == 0] = np.nan
-	chosen_pts_idxs = -np.ones(no_of_chosen_pts, dtype=int)
-	chosen_pts_idxs[[0, 1]] = [r1, r2]
-	remaining_idxs = np.array(range(potential_pts.shape[0]))
-	remaining_idxs[[r1, r2]] = -1
-	for i in range(no_of_chosen_pts-2):
-		r_of_remain = np.nanargmax(np.nanmin(
-			dist_m[:, chosen_pts_idxs[:i + 2]][remaining_idxs[remaining_idxs != -1]], axis=1))
-		target_idx = remaining_idxs[remaining_idxs != -1][r_of_remain]
-		chosen_pts_idxs[i + 2] = target_idx
-		remaining_idxs[target_idx] = -1
-	chosen_pts = all_pts[chosen_pts_idxs[starting_pts.shape[0]:], :]
-	chosen_pts = [tuple(item) for item in chosen_pts]
-	return chosen_pts
+    # choose points based on coordinates by DUPLEX method
+    no_of_chosen_pts = math.ceil(len(potential_pts) * ratio_of_choose)
+    potential_pts = np.array(potential_pts)
+    starting_pts = np.array([])
+    all_pts = potential_pts
+    dist_m = dist.cdist(potential_pts, potential_pts, 'sqeuclidean')
+    r1, r2 = np.argwhere(dist_m == dist_m.max())[0]
+    dist_m[dist_m == 0] = np.nan
+    chosen_pts_idxs = -np.ones(no_of_chosen_pts, dtype=int)
+    chosen_pts_idxs[[0, 1]] = [r1, r2]
+    remaining_idxs = np.array(range(potential_pts.shape[0]))
+    remaining_idxs[[r1, r2]] = -1
+    for i in range(no_of_chosen_pts-2):
+        r_of_remain = np.nanargmax(np.nanmin(
+            dist_m[:, chosen_pts_idxs[:i + 2]][remaining_idxs[remaining_idxs != -1]], axis=1))
+        target_idx = remaining_idxs[remaining_idxs != -1][r_of_remain]
+        chosen_pts_idxs[i + 2] = target_idx
+        remaining_idxs[target_idx] = -1
+    chosen_pts = all_pts[chosen_pts_idxs[starting_pts.shape[0]:], :]
+    chosen_pts = [tuple(item) for item in chosen_pts]
+    return chosen_pts
 
 
 def save_to_shp_points_for_sdr_rl(pts, outfile):
-	shpDriver = ogr.GetDriverByName("ESRI Shapefile")
-	if os.path.exists(outfile):
-		shpDriver.DeleteDataSource(outfile)
-	outDataSource = shpDriver.CreateDataSource(outfile)
-	outLayer = outDataSource.CreateLayer(outfile, geom_type=ogr.wkbPoint)
-	featureDefn = outLayer.GetLayerDefn()
-	for coords in pts:
-		point = ogr.Geometry(ogr.wkbPoint)
-		point.AddPoint(coords[0], coords[1])
-		outFeature = ogr.Feature(featureDefn)
-		outFeature.SetGeometry(point)
-		outLayer.CreateFeature(outFeature)
-		del point, outFeature
+    shpDriver = ogr.GetDriverByName("ESRI Shapefile")
+    if os.path.exists(outfile):
+        shpDriver.DeleteDataSource(outfile)
+    outDataSource = shpDriver.CreateDataSource(outfile)
+    outLayer = outDataSource.CreateLayer(outfile, geom_type=ogr.wkbPoint)
+    featureDefn = outLayer.GetLayerDefn()
+    for coords in pts:
+        point = ogr.Geometry(ogr.wkbPoint)
+        point.AddPoint(coords[0], coords[1])
+        outFeature = ogr.Feature(featureDefn)
+        outFeature.SetGeometry(point)
+        outLayer.CreateFeature(outFeature)
+        del point, outFeature
 

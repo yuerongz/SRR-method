@@ -11,7 +11,8 @@ class Select_Rep_pts:
     """
     Select representative points from the trajectories saved in SHP file
     """
-    def __init__(self, result_work_dir, demfile, traj_shp, rep_traj_ratio=1/200, stoping_categories=(-555, -666)):
+
+    def __init__(self, result_work_dir, demfile, traj_shp, rep_traj_ratio=1 / 200, stoping_categories=(-555, -666)):
         self.work_dir = result_work_dir
         self.dem_dataset = gdal.Open(demfile)
         self.dem_transform = self.dem_dataset.GetGeoTransform()
@@ -82,6 +83,7 @@ class Select_Rep_pts:
             del point, outFeature
 
         # trajectory filter
+
     def trajs_filtering(self, trajs):
         """
         output:
@@ -152,7 +154,7 @@ class Select_Rep_pts:
             chosen_pts_idxs[[0, 1]] = [r1, r2]
             remaining_idxs = np.array(range(potential_pts.shape[0]))
             remaining_idxs[[r1, r2]] = -1
-            for i in range(no_of_chosen_pts-2):
+            for i in range(no_of_chosen_pts - 2):
                 r_of_remain = np.nanargmax(np.nanmin(
                     dist_m[:, chosen_pts_idxs[:i + 2]][remaining_idxs[remaining_idxs != -1]], axis=1))
                 target_idx = remaining_idxs[remaining_idxs != -1][r_of_remain]
@@ -194,22 +196,22 @@ class Select_Rep_pts:
         self.save_to_shp_lines(self.extract_rep_trajs(filtered_trajs_category), outshp)
         return 0
 
-def extract_rep_pts(mcl_file, sdr_thalwegs_file, resample_rate_mcl, resample_rate_sdr_thalwegs, 
-					results_dir, outshp):
-	trajs = dict()
-	with fiona.open(sdr_thalwegs_file) as copy_shp:
-		for feature in copy_shp:
-			geom = feature['geometry']['coordinates']
-			trajs[geom[0]] = geom[1:]
-	last_pt_ls = list(set([trajs[c_k][-1] for c_k in trajs.keys()]))
-	trajs = dict()
-	with fiona.open(mcl_file) as copy_shp:
-		for feature in copy_shp:
-			geom = feature['geometry']['coordinates']
-			trajs[geom[0]] = geom[1:]
-	river_line_ls = list(trajs.values())[0]
-	river_pts = points_along_line(river_line_ls, resample_rate_mcl, resample_rate_mcl/2, resample_rate_mcl/2)
-	selected_pts = perform_DUPLEX_to_pts_for_sdr_rl(last_pt_ls, resample_rate_sdr_thalwegs) + river_pts
-	save_to_shp_points_for_sdr_rl(selected_pts, f"{results_dir}{outshp}")
-	print(f"Selected totally {len(selected_pts)} RLs, with {len(river_pts)} along MCL")
 
+def extract_rep_pts(mcl_file, sdr_thalwegs_file, resample_rate_mcl, resample_rate_sdr_thalwegs,
+                    results_dir, outshp):
+    trajs = dict()
+    with fiona.open(sdr_thalwegs_file) as copy_shp:
+        for feature in copy_shp:
+            geom = feature['geometry']['coordinates']
+            trajs[geom[0]] = geom[1:]
+    last_pt_ls = list(set([trajs[c_k][-1] for c_k in trajs.keys()]))
+    trajs = dict()
+    with fiona.open(mcl_file) as copy_shp:
+        for feature in copy_shp:
+            geom = feature['geometry']['coordinates']
+            trajs[geom[0]] = geom[1:]
+    river_line_ls = list(trajs.values())[0]
+    river_pts = points_along_line(river_line_ls, resample_rate_mcl, resample_rate_mcl / 2, resample_rate_mcl / 2)
+    selected_pts = perform_DUPLEX_to_pts_for_sdr_rl(last_pt_ls, resample_rate_sdr_thalwegs) + river_pts
+    save_to_shp_points_for_sdr_rl(selected_pts, f"{results_dir}{outshp}")
+    print(f"Selected totally {len(selected_pts)} RLs, with {len(river_pts)} along MCL")

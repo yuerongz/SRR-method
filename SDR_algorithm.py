@@ -46,6 +46,12 @@ class Traj_search:
         self.stopping_vals = stoping_categories
         self.straighten_degree = cluster_threshold
 
+        # standardise starting coordinates
+        for pt_idx in range(len(starting_pts)):
+            self.starting_pts[pt_idx, :] = rc2coords(self.dem_transform,
+                                                     coords2rc(self.dem_transform, starting_pts[pt_idx, :]))
+        del pt_idx
+
     def initial_stpts_trajs(self, search_window_size=9, save_to_shp=False, outfilename=None):
         assert search_window_size % 3 == 0, 'The searching window size must be a multiple of 3!'
         trajs = self.construct_lines_map(self.starting_pts, search_window_size)
@@ -237,8 +243,8 @@ class Traj_search:
             rcs = np.array([list(coords2rc(self.dem_transform, coords)) for coords in trajs[failed_pt]]).astype(int)
             drainage_tags = self.drainage_map[rcs[:, 0], rcs[:, 1]].astype(int)
             if np.any(drainage_tags):  # traj sharing any point with successful trajs
-                shared_idx = np.nonzero(drainage_tags)[0][
-                    0]  # 1D array, first item, the index of the first shared pt (row) in the rcs list
+                shared_idx = np.nonzero(drainage_tags)[0][0]
+                # 1D array, first item, the index of the first shared pt (row) in the rcs list
                 shared_coords = rc2coords(self.dem_transform, rcs[shared_idx, :])
                 new_traj = trajs[failed_pt][:trajs[failed_pt].index(shared_coords)]
                 new_traj.extend(trajs[success_pts[drainage_tags[shared_idx] - 1]][
